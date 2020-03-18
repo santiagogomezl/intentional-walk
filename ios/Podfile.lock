@@ -191,6 +191,8 @@ PODS:
     - React
   - react-native-splash-screen (3.2.0):
     - React
+  - react-native-universal-pedometer (2.0.3):
+    - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
   - React-RCTAnimation (0.61.5):
@@ -261,6 +263,7 @@ DEPENDENCIES:
   - "react-native-fitness (from `../node_modules/@ovalmoney/react-native-fitness`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - "react-native-universal-pedometer (from `../node_modules/@t2tx/react-native-universal-pedometer`)"
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -320,6 +323,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-universal-pedometer:
+    :path: "../node_modules/@t2tx/react-native-universal-pedometer"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -375,6 +380,7 @@ SPEC CHECKSUMS:
   react-native-fitness: 62684c849e280c521da4cb1e70d8ef02837521a1
   react-native-safe-area-context: 042dfc9d4db17196841df962ba9497f6e7a5bd02
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
+  react-native-universal-pedometer: 874e0598c5aabdafe0636f94beba7aa8dd40314f
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
