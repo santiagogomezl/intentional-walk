@@ -32,7 +32,7 @@ export default function RecordedWalk(props) {
     }
     steps = numeral(walk.steps).format('0,0');
     miles = numeral(walk.distance).format('0,0.0');
-    minutes = Math.round(moment(walk.end).diff(start, 'seconds') / 60.0);
+    minutes = Math.round(walk.elapsedTime / 60.0);
   }
   return (
     <View style={[styles.container, props.style]}>

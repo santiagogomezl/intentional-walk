@@ -4,11 +4,12 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Button from './button';
 import {Colors, GlobalStyles} from '../styles';
-import {Fitness} from '../lib';
+import {Fitness, Realm} from '../lib';
 import moment from 'moment';
 import numeral from 'numeral';
 
 export default function Recorder(props) {
+  const {activeWalk} = props;
   const safeAreaInsets = useSafeArea();
   const [data, setData] = useState(null);
   const [now, setNow] = useState(new Date());
@@ -32,11 +33,25 @@ export default function Recorder(props) {
   }, []);
 
   const onPause = () => {
-
+    setPause(new Date());
+    isPausedRef.current = true;
   };
+
+  const onResume = () => {
+    Realm.open().then(realm => {
+      realm.write(() => {
+        activeWalk.pause = (activeWalk.pause || 0) + moment(now).diff(pause, 'seconds');
+        isPausedRef.current = false;
+        setPause(null);
+      });
+    });
+  }
 
   const onStop = () => {
     let end = new Date();
+    if (pause) {
+      end = pause;
+    }
     setEnd(end);
     isEndedRef.current = true;
     Fitness.stopUpdates();
@@ -50,14 +65,17 @@ export default function Recorder(props) {
   }
 
   let dt = 0, elapsedTime;
-  if (props.activeWalk) {
+  if (activeWalk) {
     let compare = now;
     if (end) {
       compare = end;
     } else if (pause) {
       compare = pause;
     }
-    dt = moment(compare).diff(props.activeWalk.start, 'seconds');
+    dt = moment(compare).diff(activeWalk.start, 'seconds');
+    if (activeWalk.pause) {
+      dt -= activeWalk.pause;
+    }
   }
   const sec = dt % 60;
   const min = Math.floor(dt / 60);
@@ -89,18 +107,38 @@ export default function Recorder(props) {
         <View style={[styles.buttonsContainer, {paddingBottom: safeAreaInsets.bottom}]}>
           <View style={styles.secondaryButtonContainer}>
           </View>
-          <View style={styles.primaryButtonContainer}>
-            <TouchableOpacity onPress={onStop}>
-              <Image style={styles.primaryButton} source={require('../assets/stop.png')} />
-            </TouchableOpacity>
-            <Text style={[styles.buttonText, styles.recordText]}>Stop & Save</Text>
-          </View>
-          <View style={styles.secondaryButtonContainer}>
-            <TouchableOpacity style={styles.primaryButton}>
-              <Image style={styles.secondaryButton} source={require('../assets/pause.png')} />
-            </TouchableOpacity>
-            <Text style={[styles.buttonText, styles.pauseText]}>Pause</Text>
-          </View>
+          { pause &&
+            <View style={styles.primaryButtonContainer}>
+              <TouchableOpacity onPress={onResume}>
+                <Image style={styles.primaryButton} source={require('../assets/record.png')} />
+              </TouchableOpacity>
+              <Text style={[styles.buttonText, styles.resumeText]}>Resume</Text>
+            </View>
+          }
+          { !pause &&
+            <View style={styles.primaryButtonContainer}>
+              <TouchableOpacity onPress={onStop}>
+                <Image style={styles.primaryButton} source={require('../assets/stop.png')} />
+              </TouchableOpacity>
+              <Text style={[styles.buttonText, styles.recordText]}>Stop & Save</Text>
+            </View>
+          }
+          { pause &&
+            <View style={styles.secondaryButtonContainer}>
+              <TouchableOpacity onPress={onStop} style={styles.primaryButton}>
+                <Image style={styles.secondaryButton} source={require('../assets/stop.png')} />
+              </TouchableOpacity>
+              <Text style={[styles.buttonText, styles.recordText]}>Stop</Text>
+            </View>
+          }
+          { !pause &&
+            <View style={styles.secondaryButtonContainer}>
+              <TouchableOpacity onPress={onPause} style={styles.primaryButton}>
+                <Image style={styles.secondaryButton} source={require('../assets/pause.png')} />
+              </TouchableOpacity>
+              <Text style={[styles.buttonText, styles.pauseText]}>Pause</Text>
+            </View>
+          }
         </View>
       }
     </View>
@@ -190,5 +228,8 @@ const styles = StyleSheet.create({
   },
   recordText: {
     color: Colors.secondary.red,
+  },
+  resumeText: {
+    color: Colors.primary.purple
   }
 });
