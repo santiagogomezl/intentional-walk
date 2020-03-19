@@ -1,12 +1,12 @@
 'use strict'
 
 import React, {useEffect, useRef, useState} from 'react';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {useSafeArea} from 'react-native-safe-area-context';
 import {useFocusEffect} from '@react-navigation/native';
 import {ScrollView, StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import SplashScreen from 'react-native-splash-screen'
 import {Fitness, Realm} from '../../lib';
-import {DateNavigator} from '../../components';
+import {DateNavigator, Recorder} from '../../components';
 import {GlobalStyles, Colors} from '../../styles';
 import {StatBox, RecordedWalk} from '../../components';
 import moment from 'moment';
@@ -20,6 +20,7 @@ export default function HomeScreen({navigation}) {
   const [dailyDistance, setDailyDistance] = useState(null);
   const [totalSteps, setTotalSteps] = useState(null);
   const [recordedWalks, setRecordedWalks] = useState(null);
+  const [isRecording, setRecording] = useState(false);
 
   const getDailySteps = (queryDate) => {
     setDailySteps(null);
@@ -81,6 +82,16 @@ export default function HomeScreen({navigation}) {
   };
 
   useEffect(() => {
+    const listener = (results, changes) => setRecording(results.length > 0);
+    let results = null;
+    Realm.open().then(realm => {
+      results = realm.objects('IntentionalWalk').filtered('end=null');
+      results.addListener(listener);
+    });
+    return () => results ? results.removeListener(listener) : null;
+  }, []);
+
+  useEffect(() => {
     SplashScreen.hide();
     Realm.open().then(realm => {
       let users = realm.objects('AppUser');
@@ -90,11 +101,9 @@ export default function HomeScreen({navigation}) {
     })
   }, []);
 
-  // Do something when the screen is focused
   useFocusEffect(
     React.useCallback(() => {
       refresh();
-      return () => { };
     }, [])
   );
 
@@ -104,7 +113,7 @@ export default function HomeScreen({navigation}) {
   return (
     <View>
       <ScrollView style={{height: '100%'}}>
-        <View style={[GlobalStyles.content, {paddingBottom: 17+8+50+8}]}>
+        <View style={[GlobalStyles.content, {paddingBottom: 17+10+50+20}]}>
           <DateNavigator style={{marginBottom: 16}} date={date} setDate={setDateAndGetDailySteps}/>
           <View style={styles.row}>
             <StatBox
@@ -157,12 +166,16 @@ export default function HomeScreen({navigation}) {
           }
         </View>
       </ScrollView>
-      <View style={[styles.recordContainer, {paddingBottom: safeAreaInsets.bottom}]}>
-        <TouchableOpacity>
-          <Image style={styles.recordButton} source={require('../../assets/record.png')} />
-        </TouchableOpacity>
-        <Text style={styles.recordText}>Record a Walk</Text>
-      </View>
+      { !isRecording &&
+        <View pointerEvents="box-none" style={[styles.recordContainer, {paddingBottom: safeAreaInsets.bottom}]}>
+          <TouchableOpacity onPress={() => Fitness.startRecording()}>
+            <Image style={styles.recordButton} source={require('../../assets/record.png')} />
+          </TouchableOpacity>
+          <Text style={styles.recordText}>Record a Walk</Text>
+        </View> }
+      <Recorder
+        style={[styles.recorder, {paddingBottom: safeAreaInsets.bottom}]}
+        isRecording={isRecording} />
     </View>
   );
 }
@@ -214,12 +227,18 @@ const styles = StyleSheet.create({
     color: Colors.primary.gray2,
     textDecorationLine: 'underline'
   },
+  recorder: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%'
+  },
   recordContainer: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'flex-end'
   },
   recordButton: {
     width: 54,
@@ -229,6 +248,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold',
     color: Colors.primary.purple,
-    marginTop: 8
+    marginTop: 8,
+    marginBottom: 20
   }
 });
