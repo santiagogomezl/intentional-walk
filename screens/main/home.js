@@ -113,68 +113,70 @@ export default function HomeScreen({navigation}) {
   const dateString = date.isSame(today) ? 'Today' : date.format('MMMM D');
 
   return (
-    <View>
-      <ScrollView style={{height: '100%'}}>
-        <View style={[GlobalStyles.content, {paddingBottom: safeAreaInsets.bottom + 20 + 17 + 10 + 54}]}>
-          <DateNavigator style={{marginBottom: 16}} date={date} setDate={setDateAndGetDailySteps}/>
-          <View style={styles.row}>
-            <StatBox
-              mainText={dailySteps ? numeral(dailySteps.quantity).format('0,0') : "*"}
-              subText="steps today"
-              icon="directions-walk"
-              iconSize={170}
-              iconStyle={{top: -20, right: -35}}
-              style={styles.box}
-              boxColor={Colors.accent.teal}
-            />
-            <StatBox
-              mainText={dailyDistance ? numeral(dailyDistance.quantity / 1609.0).format('0,0.0') : "*"}
-              subText="miles today"
-              icon="swap-calls"
-              iconSize={240}
-              iconStyle={{top: -30, left: -40, width: '200%'}}
-              style={styles.box}
-              boxColor={Colors.primary.lightGreen}
-            />
-          </View>
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('WhereToWalk')}>
-              <View style={styles.photoBox}>
-                <Image style={styles.photo} source={require('../../assets/dolorespark.jpg')} />
-                <Text style={styles.photoText}>Where to Walk?</Text>
-              </View>
-            </TouchableOpacity>
-            <StatBox
-              mainText={totalSteps ? numeral(totalSteps.quantity).format('0,0') : "*"}
-              subText="overall step total"
-              icon="star-border"
-              iconSize={200}
-              iconStyle={{top: -10, right: -30}}
-              style={styles.box}
-              boxColor={Colors.accent.orange}
-            />
-          </View>
-          <View style={[styles.row, styles.subtitle]}>
-            <Text style={styles.subtitleHeader}>My Recorded Walks {dateString}</Text>
-            <Text style={styles.subtitleLink} onPress={() => navigation.navigate('RecordedWalks')}>All Recorded Walks</Text>
-          </View>
-          { recordedWalks && recordedWalks.length == 0 &&
-            <RecordedWalk
-              title="No Walks Yet"
-              subtitle="Start a new walk by pressing the record button at the bottom of the screen." />
-          }
-          { recordedWalks && recordedWalks.length > 0 &&
-              recordedWalks.map(walk => <RecordedWalk key={walk.id} walk={walk} />)
-          }
-        </View>
-      </ScrollView>
+    <View style={{flex: 1}}>
       { !activeWalk &&
+      <>
+        <ScrollView>
+          <View style={[GlobalStyles.content, {paddingBottom: safeAreaInsets.bottom + 20 + 17 + 10 + 54}]}>
+            <DateNavigator style={{marginBottom: 16}} date={date} setDate={setDateAndGetDailySteps}/>
+            <View style={styles.row}>
+              <StatBox
+                mainText={dailySteps ? numeral(dailySteps.quantity).format('0,0') : "*"}
+                subText="steps today"
+                icon="directions-walk"
+                iconSize={170}
+                iconStyle={{top: -20, right: -35}}
+                style={styles.box}
+                boxColor={Colors.accent.teal}
+              />
+              <StatBox
+                mainText={dailyDistance ? numeral(dailyDistance.quantity / 1609.0).format('0,0.0') : "*"}
+                subText="miles today"
+                icon="swap-calls"
+                iconSize={240}
+                iconStyle={{top: -30, left: -40, width: '200%'}}
+                style={styles.box}
+                boxColor={Colors.primary.lightGreen}
+              />
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.box} onPress={() => navigation.navigate('WhereToWalk')}>
+                <View style={styles.photoBox}>
+                  <Image style={styles.photo} source={require('../../assets/dolorespark.jpg')} />
+                  <Text style={styles.photoText}>Where to Walk?</Text>
+                </View>
+              </TouchableOpacity>
+              <StatBox
+                mainText={totalSteps ? numeral(totalSteps.quantity).format('0,0') : "*"}
+                subText="overall step total"
+                icon="star-border"
+                iconSize={200}
+                iconStyle={{top: -10, right: -30}}
+                style={styles.box}
+                boxColor={Colors.accent.orange}
+              />
+            </View>
+            <View style={[styles.row, styles.subtitle]}>
+              <Text style={styles.subtitleHeader}>My Recorded Walks {dateString}</Text>
+              <Text style={styles.subtitleLink} onPress={() => navigation.navigate('RecordedWalks')}>All Recorded Walks</Text>
+            </View>
+            { recordedWalks && recordedWalks.length == 0 &&
+              <RecordedWalk
+                title="No Walks Yet"
+                subtitle="Start a new walk by pressing the record button at the bottom of the screen." />
+            }
+            { recordedWalks && recordedWalks.length > 0 &&
+                recordedWalks.map(walk => <RecordedWalk key={walk.id} walk={walk} />)
+            }
+          </View>
+        </ScrollView>
         <View pointerEvents="box-none" style={[styles.recordContainer, {paddingBottom: safeAreaInsets.bottom}]}>
           <TouchableOpacity onPress={() => Fitness.startRecording()}>
             <Image style={styles.recordButton} source={require('../../assets/record.png')} />
           </TouchableOpacity>
           <Text style={styles.recordText}>Record a Walk</Text>
-        </View> }
+        </View>
+      </> }
       { activeWalk &&
         <Recorder
           style={[styles.recorder, {paddingBottom: safeAreaInsets.bottom}]}
