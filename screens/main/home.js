@@ -20,7 +20,7 @@ export default function HomeScreen({navigation}) {
   const [dailyDistance, setDailyDistance] = useState(null);
   const [totalSteps, setTotalSteps] = useState(null);
   const [recordedWalks, setRecordedWalks] = useState(null);
-  const [isRecording, setRecording] = useState(false);
+  const [activeWalk, setActiveWalk] = useState(false);
 
   const getDailySteps = (queryDate) => {
     setDailySteps(null);
@@ -46,7 +46,9 @@ export default function HomeScreen({navigation}) {
 
   const getRecordedWalks = (queryDate) => {
     Realm.open().then(realm => {
-      const recordedWalks = realm.objects('IntentionalWalk').filtered('start>=$0 AND end<$1', queryDate.toDate(), moment(queryDate).add(1, 'd').toDate());
+      const recordedWalks = realm.objects('IntentionalWalk')
+        .filtered('start>=$0 AND end<$1', queryDate.toDate(), moment(queryDate).add(1, 'd').toDate())
+        .sorted([['end', true]]);
       if (dateRef.current.isSame(queryDate)) {
         setRecordedWalks(recordedWalks);
       }
@@ -82,7 +84,7 @@ export default function HomeScreen({navigation}) {
   };
 
   useEffect(() => {
-    const listener = (results, changes) => setRecording(results.length > 0);
+    const listener = (results, changes) => setActiveWalk(results.length > 0 ? results[0] : null);
     let results = null;
     Realm.open().then(realm => {
       results = realm.objects('IntentionalWalk').filtered('end=null');
@@ -113,7 +115,7 @@ export default function HomeScreen({navigation}) {
   return (
     <View>
       <ScrollView style={{height: '100%'}}>
-        <View style={[GlobalStyles.content, {paddingBottom: 17+10+50+20}]}>
+        <View style={[GlobalStyles.content, {paddingBottom: safeAreaInsets.bottom + 20 + 17 + 10 + 54}]}>
           <DateNavigator style={{marginBottom: 16}} date={date} setDate={setDateAndGetDailySteps}/>
           <View style={styles.row}>
             <StatBox
@@ -162,20 +164,21 @@ export default function HomeScreen({navigation}) {
               subtitle="Start a new walk by pressing the record button at the bottom of the screen." />
           }
           { recordedWalks && recordedWalks.length > 0 &&
-              recordedWalks.map(walk => <RecordedWalk walk={walk} />)
+              recordedWalks.map(walk => <RecordedWalk key={walk.id} walk={walk} />)
           }
         </View>
       </ScrollView>
-      { !isRecording &&
+      { !activeWalk &&
         <View pointerEvents="box-none" style={[styles.recordContainer, {paddingBottom: safeAreaInsets.bottom}]}>
           <TouchableOpacity onPress={() => Fitness.startRecording()}>
             <Image style={styles.recordButton} source={require('../../assets/record.png')} />
           </TouchableOpacity>
           <Text style={styles.recordText}>Record a Walk</Text>
         </View> }
-      <Recorder
-        style={[styles.recorder, {paddingBottom: safeAreaInsets.bottom}]}
-        isRecording={isRecording} />
+      { activeWalk &&
+        <Recorder
+          style={[styles.recorder, {paddingBottom: safeAreaInsets.bottom}]}
+          activeWalk={activeWalk} /> }
     </View>
   );
 }

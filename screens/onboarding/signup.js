@@ -9,7 +9,9 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 import {Button, CheckBox, Input} from '../../components';
 import {Colors, GlobalStyles} from '../../styles';
 import {Realm} from '../../lib';
@@ -30,7 +32,9 @@ export default function SignUpScreen({navigation}) {
       try {
         realm.write(() => {
           realm.create('AppUser', {
-            name, email, zip, age: parseInt(age)
+            id: uuidv4(),
+            name, email, zip,
+            age: parseInt(age)
           });
           navigation.navigate('Info');
         });
