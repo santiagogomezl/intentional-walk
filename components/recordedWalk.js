@@ -36,38 +36,40 @@ export default function RecordedWalk(props) {
   }
   return (
     <View style={[styles.container, props.style]}>
-      <View style={styles.row1}>
-        <Text style={styles.mainTitle}>{title}</Text>
-        {date &&
-          <View style={styles.dateContainer}>
-            <Text style={styles.statsTitle}>{date}</Text>
-          </View>}
-      </View>
-      {steps === undefined ?
-        <View style={styles.row2}>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+      <View style={styles.clipContainer}>
+        <View style={styles.row1}>
+          <Text style={styles.mainTitle}>{title}</Text>
+          {date &&
+            <View style={styles.dateContainer}>
+              <Text style={styles.statsTitle}>{date}</Text>
+            </View>}
         </View>
-        :
-        <>
-          <View style={[styles.row2, {paddingRight: 100}]}>
-            <View style={styles.stats}>
-              <Text style={styles.statsTitle}>{steps}</Text>
-              <Text style={styles.subtitle}>steps</Text>
-            </View>
-            <View style={styles.stats}>
-              <Text style={styles.statsTitle}>{miles}</Text>
-              <Text style={styles.subtitle}>miles</Text>
-            </View>
-            <View style={styles.stats}>
-              <Text style={styles.statsTitle}>{minutes}</Text>
-              <Text style={styles.subtitle}>mins</Text>
-            </View>
+        {steps === undefined ?
+          <View style={styles.row2}>
+            <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
-          <View style={styles.iconContainer}>
-            <Icon style={styles.icon} name="timer" size={100} />
-          </View>
-        </>
-      }
+          :
+          <>
+            <View style={[styles.row2, {paddingRight: 100}]}>
+              <View style={styles.stats}>
+                <Text style={styles.statsTitle}>{steps}</Text>
+                <Text style={styles.subtitle}>steps</Text>
+              </View>
+              <View style={styles.stats}>
+                <Text style={styles.statsTitle}>{miles}</Text>
+                <Text style={styles.subtitle}>miles</Text>
+              </View>
+              <View style={styles.stats}>
+                <Text style={styles.statsTitle}>{minutes}</Text>
+                <Text style={styles.subtitle}>mins</Text>
+              </View>
+            </View>
+            <View style={styles.iconContainer}>
+              <Icon style={styles.icon} name="timer" size={100} />
+            </View>
+          </>
+        }
+      </View>
     </View>
   );
 }
@@ -79,6 +81,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     height: 80,
     marginBottom: 16,
+  },
+  clipContainer: {
+    flex: 1,
+    overflow: 'hidden'
   },
   mainTitle: {
     color: Colors.primary.purple,
