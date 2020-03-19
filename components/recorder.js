@@ -21,7 +21,8 @@ export default function Recorder(props) {
   useEffect(() => {
     Fitness.startUpdates(data => {
       if (!isEndedRef.current && !isPausedRef.current) {
-        setData(data)
+        setData(data);
+        Fitness.updateCurrentWalk(data);
       }
     });
     return () => Fitness.stopUpdates();
@@ -92,11 +93,11 @@ export default function Recorder(props) {
           <Text style={styles.label}>min</Text>
         </View>
         <View>
-          <Text style={styles.count}>{data ? numeral(data.distance * 0.000621371).format('0.0') : '0.0'}</Text>
+          <Text style={styles.count}>{activeWalk.distance ? numeral(activeWalk.distance).format('0.0') : '0.0'}</Text>
           <Text style={styles.label}>miles</Text>
         </View>
         <View>
-          <Text style={styles.count}>{data ? data.numberOfSteps : 0}</Text>
+          <Text style={styles.count}>{activeWalk.steps ? (activeWalk.steps || 0) : 0}</Text>
           <Text style={styles.label}>steps</Text>
         </View>
         <View style={{opacity: end ? 1 : 0}}>
