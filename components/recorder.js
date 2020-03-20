@@ -86,10 +86,19 @@ export default function Recorder(props) {
   const min = Math.floor(dt / 60);
   elapsedTime = `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`
 
+  let headerColor = Colors.primary.lightGreen;
+  let headerText = 'Recording';
+  if (pause) {
+    headerColor = Colors.accent.yellow;
+    headerText = 'Paused';
+  } else if (end) {
+    headerColor = Colors.secondary.red;
+    headerText = `Save ${activeWalk.timeOfWalk}`;
+  }
   return (
     <View pointerEvents="box-none" style={[styles.container, props.style]}>
-      <View style={styles.header}>
-        <Text style={[GlobalStyles.h2, styles.headerText]}>Recording</Text>
+      <View style={[styles.header, {backgroundColor: headerColor}]}>
+        <Text style={[GlobalStyles.h2, styles.headerText]}>{headerText}</Text>
       </View>
       <View style={styles.body}>
         <View>

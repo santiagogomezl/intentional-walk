@@ -9,18 +9,8 @@ export default function RecordedWalk(props) {
   let {title, date, subtitle, steps, miles, minutes} = props;
   const walk = props.walk;
   if (walk) {
+    title = walk.timeOfWalk;
     const start = moment(walk.start);
-    const noon = moment(start).startOf('day').add(12, 'h');
-    if (start.isBefore(noon)) {
-      title = "Morning Walk";
-    } else {
-      const evening = moment(noon).add(6, 'h');
-      if (start.isBefore(evening)) {
-        title = "Afternoon Walk";
-      } else {
-        title = "Evening Walk";
-      }
-    }
     const today = moment().startOf('day');
     const yesterday = moment(today).subtract(1, 'd');
     if (start.isSameOrAfter(today)) {

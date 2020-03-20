@@ -30,15 +30,15 @@ export default function RecordedWalksScreen({navigation}) {
           style={styles.list}
           data={recordedWalks}
           getItemCount={(data) => data.length + 1}
-          getItem={(data, i) => i == 0 ? {} : data[i - 1]}
+          getItem={(data, i) => i == 0 ? {id: ""} : data[i - 1]}
           renderItem={({item}) => {
-            if (item.id) {
+            if (item.id != "") {
               return <RecordedWalk style={styles.walk} key={item.id} walk={item} />;
             } else {
               return <>
-                <PageTitle style={styles.pageTitle} key={-1} title="My Recorded Walks" />
+                <PageTitle style={styles.pageTitle} title="My Recorded Walks" />
                 { recordedWalks.length == 0 &&
-                  <RecordedWalk key={-2} style={styles.walk} title="No Recorded Walks" /> }
+                  <RecordedWalk style={styles.walk} title="No Recorded Walks" /> }
               </>;
             }
           }}
