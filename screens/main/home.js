@@ -171,7 +171,7 @@ export default function HomeScreen({navigation}) {
           </View>
         </ScrollView>
         <View pointerEvents="box-none" style={[styles.recordContainer, {paddingBottom: safeAreaInsets.bottom}]}>
-          <TouchableOpacity onPress={() => Fitness.startRecording()}>
+          <TouchableOpacity onPress={() => Realm.startWalk()}>
             <Image style={styles.recordButton} source={require('../../assets/record.png')} />
           </TouchableOpacity>
           <Text style={styles.recordText}>Record a Walk</Text>

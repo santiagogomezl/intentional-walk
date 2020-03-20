@@ -4,7 +4,7 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Button from './button';
 import {Colors, GlobalStyles} from '../styles';
-import {Fitness, Realm} from '../lib';
+import {Fitness, Pedometer, Realm} from '../lib';
 import moment from 'moment';
 import numeral from 'numeral';
 
@@ -19,13 +19,13 @@ export default function Recorder(props) {
   const isEndedRef = useRef(false);
 
   useEffect(() => {
-    Fitness.startUpdates(data => {
+    Pedometer.startUpdates(data => {
       if (!isEndedRef.current && !isPausedRef.current) {
         setData(data);
-        Fitness.updateCurrentWalk(data);
+        Realm.updateCurrentWalk(data);
       }
     });
-    return () => Fitness.stopUpdates();
+    return () => Pedometer.stopUpdates();
   }, []);
 
   useEffect(() => {
@@ -55,13 +55,13 @@ export default function Recorder(props) {
     }
     setEnd(end);
     isEndedRef.current = true;
-    Fitness.stopUpdates();
-    Fitness.getPedometerData(end).then(pedometerData => setData(data));
+    Pedometer.stopUpdates();
+    Pedometer.getPedometerData(end).then(pedometerData => setData(data));
   };
 
   const onFinish = () => {
     if (end) {
-      Fitness.stopRecording(end, data);
+      Realm.stopWalk(end, data);
     }
   }
 
