@@ -10,8 +10,6 @@ import {
   Image,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid';
 import {Button, CheckBox, Input} from '../../components';
 import {Colors, GlobalStyles} from '../../styles';
 import {Realm} from '../../lib';
@@ -28,19 +26,11 @@ export default function SignUpScreen({navigation}) {
   const pressHandler = () => {
     // TODO: validate form fields
     // TODO: contact server
-    Realm.open().then(realm => {
-      try {
-        realm.write(() => {
-          realm.create('AppUser', {
-            id: uuidv4(),
-            name, email, zip,
-            age: parseInt(age)
-          });
-          navigation.navigate('Info');
-        });
-      } catch (e) {
-        console.log(e);
-      }
+    Realm.createUser(name, email, zip, age).then(user => {
+      navigation.navigate('Info');
+    }).catch(error => {
+      console.log(e);
+      // TODO: display error message
     });
   };
 

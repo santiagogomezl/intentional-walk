@@ -95,12 +95,11 @@ export default function HomeScreen({navigation}) {
 
   useEffect(() => {
     SplashScreen.hide();
-    Realm.open().then(realm => {
-      let users = realm.objects('AppUser');
-      if (users.length == 0) {
+    Realm.getUser().then(user => {
+      if (!user) {
         navigation.navigate('OnboardingStack');
       }
-    })
+    });
   }, []);
 
   useFocusEffect(
