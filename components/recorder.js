@@ -56,7 +56,11 @@ export default function Recorder(props) {
     setEnd(end);
     isEndedRef.current = true;
     Pedometer.stopUpdates();
-    Pedometer.getPedometerData(end).then(pedometerData => setData(data));
+    //// get one final update
+    Pedometer.getPedometerData(end).then(data => {
+      setData(data)
+      Realm.updateCurrentWalk(data);
+    });
   };
 
   const onFinish = () => {
