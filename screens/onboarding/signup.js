@@ -10,7 +10,7 @@ import {
   Image,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Button, CheckBox, Input} from '../../components';
+import {Button, CheckBox, Input, PaginationDots} from '../../components';
 import {Colors, GlobalStyles} from '../../styles';
 import {Realm, Strings} from '../../lib';
 
@@ -62,6 +62,7 @@ export default function SignUpScreen({navigation}) {
             <Text style={[GlobalStyles.p1, {alignSelf: 'flex-start'}]}>{Strings.signUp.required}</Text>
             <CheckBox style={{alignSelf: 'flex-start'}} checked={termsAgreed} onPress={() => setTermsAgreed(!termsAgreed)} title={Strings.formatString(Strings.signUp.agree, Strings.signUp.policy)} />
             <Button isEnabled={isValid()} style={styles.button} onPress={pressHandler}>{Strings.signUp.submit}</Button>
+            <PaginationDots currentPage={1} totalPages={3} />
           </View>
         </KeyboardAwareScrollView>
     </SafeAreaView>

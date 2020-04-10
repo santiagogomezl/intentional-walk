@@ -10,7 +10,7 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import {Button, InfoBox} from '../../components';
+import {Button, InfoBox, PaginationDots} from '../../components';
 import {Colors, GlobalStyles} from '../../styles';
 import {Strings} from '../../lib';
 
@@ -50,6 +50,7 @@ export default function InfoScreen({navigation}) {
             </InfoBox>
           </View>
           <Button style={styles.button} onPress={onNextPress}>{Strings.common.next}</Button>
+          <PaginationDots currentPage={2} totalPages={3} />
         </View>
       </ScrollView>
     </SafeAreaView>
