@@ -5,7 +5,7 @@ import {Colors, GlobalStyles} from '../styles';
 
 export default function InfoBox(props) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, props.style]}>
       <View style={styles.icon}>
         { props.icon && (
         <Icon name={props.icon} size={props.iconSize} color={props.iconColor} style={props.iconStyle} />

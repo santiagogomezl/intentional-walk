@@ -40,18 +40,23 @@ export default function InfoScreen({navigation}) {
         <Text style={GlobalStyles.h1}>{Strings.permissions.thingsToKnow}</Text>
         <View style={{flex: 1, alignSelf: 'stretch'}}>
           <Text style={styles.subtitle}>{Strings.permissions.takeALookText}</Text>
-            <InfoBox icon="settings"
+            <InfoBox style={styles.infoBox}
+                     icon="settings"
                      iconSize={64}
-                     iconColor={Colors.primary.purple}>
+                     iconColor={Colors.primary.lightGreen}
+                     iconStyle={{marginTop: 10}}>
              {Strings.permissions.settingsText}
             </InfoBox>
-            <InfoBox icon="lock"
+            <InfoBox style={[styles.infoBox, Platform.select({ios: styles.infoBoxLast})]}
+                     icon="lock"
                      iconSize={64}
-                     iconColor={Colors.secondary.blue}>
+                     iconColor={Colors.secondary.blue}
+                     iconStyle={{marginTop: 20}}>
               {Strings.permissions.prizeText}
             </InfoBox>
             { Platform.OS == 'android' ? (
-              <InfoBox icon="account-circle"
+              <InfoBox style={[styles.infoBox, styles.infoBoxLast]}
+                       icon="account-circle"
                        iconSize={64}
                        iconColor={Colors.primary.darkGreen}>
                 {Strings.permissions.googleText}
@@ -72,9 +77,17 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
-    marginBottom: 48,
+    alignSelf: 'center',
+    maxWidth: 250,
+    marginBottom: 70,
     fontSize: 17,
     color: Colors.primary.gray2,
+  },
+  infoBox: {
+    marginBottom: 60,
+  },
+  infoBoxLast: {
+    marginBottom: 30,
   },
   whiteText: {
     color: 'white',

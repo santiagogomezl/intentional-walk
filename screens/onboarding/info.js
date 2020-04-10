@@ -28,17 +28,20 @@ export default function InfoScreen({navigation}) {
           <View style={{flex: 1, alignSelf: 'stretch'}}>
             <Text style={styles.subtitle}>{Strings.info.fromHereText}</Text>
             <InfoBox title={Strings.info.walk}
+                     style={styles.infoBox}
                      icon="directions-walk"
                      iconSize={80}
                      iconColor={Colors.accent.teal}>
               {Strings.info.walkText}
             </InfoBox>
             <InfoBox title={Strings.info.record}
+                     style={styles.infoBox}
                      image={require('../../assets/record.png')}
                      imageStyle={styles.recordButton}>
               {Strings.info.recordText}
             </InfoBox>
             <InfoBox title={Strings.info.win}
+                     style={styles.infoBox}
                      icon="star-border"
                      iconSize={80}
                      iconColor={Colors.accent.orange}
@@ -63,6 +66,9 @@ const styles = StyleSheet.create({
     marginBottom: 70,
     fontSize: 17,
     color: Colors.primary.gray2,
+  },
+  infoBox: {
+    marginBottom: 30,
   },
   button: {
     width: 180,
