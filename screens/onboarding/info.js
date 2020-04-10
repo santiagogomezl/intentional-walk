@@ -34,15 +34,15 @@ export default function InfoScreen({navigation}) {
               {Strings.info.walkText}
             </InfoBox>
             <InfoBox title={Strings.info.record}
-                     icon="play-circle-filled"
-                     iconSize={80}
-                     iconColor={Colors.primary.purple}>
+                     image={require('../../assets/record.png')}
+                     imageStyle={styles.recordButton}>
               {Strings.info.recordText}
             </InfoBox>
             <InfoBox title={Strings.info.win}
                      icon="star-border"
                      iconSize={80}
-                     iconColor={Colors.accent.orange}>
+                     iconColor={Colors.accent.orange}
+                     iconStyle={styles.starIcon}>
               {Strings.info.winText}
             </InfoBox>
           </View>
@@ -60,11 +60,19 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
-    marginBottom: 48,
+    marginBottom: 70,
     fontSize: 17,
     color: Colors.primary.gray2,
   },
   button: {
     width: 180,
   },
+  recordButton: {
+    marginTop: 20,
+    width: 54,
+    height: 54,
+  },
+  starIcon: {
+    marginTop: 20,
+  }
 });

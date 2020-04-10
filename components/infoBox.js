@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Colors, GlobalStyles} from '../styles';
 
@@ -7,7 +7,12 @@ export default function InfoBox(props) {
   return (
     <View style={styles.container}>
       <View style={styles.icon}>
-        <Icon name={props.icon} size={props.iconSize} color={props.iconColor} />
+        { props.icon && (
+        <Icon name={props.icon} size={props.iconSize} color={props.iconColor} style={props.iconStyle} />
+        ) }
+        { props.image && (
+        <Image source={props.image} style={props.imageStyle} />
+        ) }
       </View>
       <View style={styles.text}>
         { props.title ? (
@@ -18,6 +23,7 @@ export default function InfoBox(props) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
