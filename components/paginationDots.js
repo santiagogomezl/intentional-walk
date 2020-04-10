@@ -7,7 +7,7 @@ export default function PaginationDots(props) {
   const currentPage = props.currentPage;
   const dots = [];
   for (let i = 0; i < totalPages; i++) {
-    dots.push(<View style={[styles.dot, (i+1 == currentPage ? styles.currentDot : null)]} />)
+    dots.push(<View key={i} style={[styles.dot, (i+1 == currentPage ? styles.currentDot : null)]} />)
   }
   return (
     <View style={[styles.dots, props.style]}>
