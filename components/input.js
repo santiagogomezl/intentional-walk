@@ -23,7 +23,8 @@ export default function Input(props) {
 
   return (
     <TextInput ref={textInputRef}
-               style={[styles.input, props.style, value != '' ? styles.inputFocused : {}]}
+               editable={props.editable}
+               style={[styles.input, props.style, value != '' ? styles.inputFocused : {}, props.editable ? {} : styles.inputDisabled]}
                onChangeText={(newValue) => onChangeText(newValue)}
                onSubmitEditing={(nativeEvent) => props.onSubmitEditing ? props.onSubmitEditing(nativeEvent) : null}
                placeholder={props.placeholder}
@@ -50,5 +51,9 @@ const styles = StyleSheet.create({
   },
   inputFocused: {
     borderColor: Colors.primary.purple,
+  },
+  inputDisabled: {
+    color: Colors.primary.gray2,
+    borderColor: Colors.primary.gray2,
   }
 });
