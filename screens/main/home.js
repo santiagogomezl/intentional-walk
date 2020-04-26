@@ -18,8 +18,7 @@ export default function HomeScreen({navigation}) {
   const dateRef = useRef(moment().startOf('day'));
   const [date, setDate] = useState(dateRef.current);
   const [dailyWalks, setDailyWalks] = useState(null);
-  const [dailySteps, setDailySteps] = useState(null);
-  const [dailyDistance, setDailyDistance] = useState(null);
+  const [todaysWalk, setTodaysWalk] = useState(null);
   const [totalSteps, setTotalSteps] = useState(null);
 
   const [recordedWalks, setRecordedWalks] = useState(null);
@@ -44,8 +43,7 @@ export default function HomeScreen({navigation}) {
   };
 
   const getStepsAndDistances = (queryDate, dailyWalks) => {
-    setDailySteps(null);
-    setDailyDistance(null);
+    setTodaysWalk(null);
     if (dailyWalks == null) {
       setDailyWalks(true);
       setTotalSteps(null);
@@ -61,25 +59,25 @@ export default function HomeScreen({navigation}) {
           console.log(error);
         });
     } else if (Array.isArray(dailyWalks)) {
-      let stepsQuantity = 0;
-      let distanceQuantity = 0;
-      let total = 0;
+      let todaysWalk = {
+        steps: 0,
+        distance: 0,
+      };
+      let newTotalSteps = 0;
       let from = moment(queryDate).startOf('day');
       let to = moment(from).endOf('day');
       for (let dailyWalk of dailyWalks) {
         if (from.isSameOrBefore(dailyWalk.date) && to.isSameOrAfter(dailyWalk.date)) {
-          stepsQuantity = dailyWalk.steps;
-          distanceQuantity = dailyWalk.distance;
+          todaysWalk = dailyWalk;
           if (totalSteps != null) {
             break;
           }
         }
-        total += dailyWalk.steps;
+        newTotalSteps += dailyWalk.steps;
       }
-      setDailySteps({quantity: stepsQuantity});
-      setDailyDistance({quantity: distanceQuantity});
+      setTodaysWalk(todaysWalk);
       if (totalSteps == null) {
-        setTotalSteps({quantity: total});
+        setTotalSteps(newTotalSteps);
       }
     }
   }
@@ -169,7 +167,7 @@ export default function HomeScreen({navigation}) {
             </View> }
             <View style={styles.row}>
               <StatBox
-                mainText={dailySteps ? numeral(dailySteps.quantity).format('0,0') : "*"}
+                mainText={todaysWalk ? numeral(todaysWalk.steps).format('0,0') : "*"}
                 subText={isToday ? Strings.home.stepsToday : Strings.common.steps}
                 icon="directions-walk"
                 iconSize={140}
@@ -178,7 +176,7 @@ export default function HomeScreen({navigation}) {
                 boxColor={Colors.accent.teal}
               />
               <StatBox
-                mainText={dailyDistance ? numeral(dailyDistance.quantity * 0.000621371).format('0,0.0') : "*"}
+                mainText={todaysWalk ? numeral(todaysWalk.distance * 0.000621371).format('0,0.0') : "*"}
                 subText={isToday ? Strings.home.milesToday : Strings.common.miles}
                 icon="swap-calls"
                 iconSize={200}
@@ -189,7 +187,7 @@ export default function HomeScreen({navigation}) {
             </View>
             <View style={[styles.row, isToday ? null : styles.hidden]} pointerEvents={isToday? 'auto' : 'none'}>
               <StatBox
-                mainText={totalSteps ? numeral(totalSteps.quantity).format('0,0') : "*"}
+                mainText={totalSteps != null ? numeral(totalSteps).format('0,0') : "*"}
                 subText={Strings.home.overallStepTotal}
                 icon="star-border"
                 iconSize={200}
