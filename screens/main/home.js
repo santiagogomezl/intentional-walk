@@ -17,9 +17,7 @@ export default function HomeScreen({navigation}) {
   const safeAreaInsets = useSafeArea();
   const dateRef = useRef(moment().startOf('day'));
   const [date, setDate] = useState(dateRef.current);
-  const [steps, setSteps] = useState(null);
-  const [distances, setDistances] = useState(null);
-
+  const [dailyWalks, setDailyWalks] = useState(null);
   const [dailySteps, setDailySteps] = useState(null);
   const [dailyDistance, setDailyDistance] = useState(null);
   const [totalSteps, setTotalSteps] = useState(null);
@@ -27,99 +25,53 @@ export default function HomeScreen({navigation}) {
   const [recordedWalks, setRecordedWalks] = useState(null);
   const [activeWalk, setActiveWalk] = useState(false);
 
-  const saveStepsAndDistances = (steps, distances) => {
-    if (Array.isArray(steps) && Array.isArray(distances)) {
-      /// combine steps and distances into a single payload as expected by API
-      const dailyWalks = [];
-      for (let [i, step] of steps.entries()) {
-        const dailyWalk = {
-          date: moment(step.startDate).format('YYYY-MM-DD'),
-          steps: step.quantity
-        };
-        if (i < distances.length && distances[i].startDate.isSame(step.startDate)) {
-          dailyWalk.distance = distances[i].quantity;
-        } else {
-          /// not sure if this will ever happen, but just in case steps/distances array don't match
-          for (let distance of distances) {
-            if (distance.startDate.isSame(step.startDate)) {
-              dailyWalk.distance = distance.quantity;
-              break;
-            }
-          }
+  const saveStepsAndDistances = (dailyWalks) => {
+    /// get user account, then save to server...!
+    Realm.getUser()
+      .then(user => {
+        if (user) {
+          return Api.dailyWalk.create(dailyWalks, user.id);
         }
-        dailyWalks.push(dailyWalk);
-      }
-      /// get user account, then save to server...!
-      Realm.getUser()
-        .then(user => {
-          if (user) {
-            return Api.dailyWalk.create(dailyWalks, user.id);
-          }
-        })
-        .then(response => {
-          if (response) {
-            console.log(response.data.status, response.data.message);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    }
+      })
+      .then(response => {
+        /// silent for now
+      })
+      .catch(error => {
+        /// silent for now- send to remote logger (Firebase?)
+      });
   };
 
-  const getStepsAndDistances = (queryDate, steps, distances) => {
+  const getStepsAndDistances = (queryDate, dailyWalks) => {
     setDailySteps(null);
     setDailyDistance(null);
-    if (steps == null || distances == null) {
-      setSteps(true);
+    if (dailyWalks == null) {
+      setDailyWalks(true);
       setTotalSteps(null);
-      Promise.all([
-        Fitness.getSteps(moment(dateRef.current).startOf('month'), moment(dateRef.current).endOf('month')),
-        Fitness.getDistance(moment(dateRef.current).startOf('month'), moment(dateRef.current).endOf('month')),
-      ]).then(([steps, distances]) => {
-        if (moment(dateRef.current).startOf('month').isSame(moment(queryDate).startOf('month'))) {
-          setSteps(steps);
-          setDistances(distances);
-          console.log(steps, distances);
-          getStepsAndDistances(dateRef.current, steps, distances);
-          saveStepsAndDistances(steps, distances);
-        }
-      });
-    } else if (Array.isArray(steps) && Array.isArray(distances)) {
-      let daySteps = 0;
-      let newTotalSteps = 0;
-      let dayDistance = 0;
-      const from = moment(queryDate)
-      const to = moment(from).add(1, 'days')
-      for (let [i, step] of steps.entries()) {
-        if (moment(step.startDate).isSameOrAfter(from) && moment(step.endDate).isSameOrBefore(to)) {
-          daySteps = step.quantity;
-          console.log('todays steps', daySteps, 'index', i)
-          if (i < distances.length && distances[i].startDate.isSame(step.startDate)) {
-            dayDistance = distances[i].quantity;
-            console.log('todays distance', dayDistance);
-          } else {
-            /// not sure if this will ever happen, but just in case steps/distances array don't match
-            console.log('distance searching');
-            for (let distance of distances) {
-              if (distance.startDate.isSame(step.startDate)) {
-                dayDistance = distance.quantity;
-                console.log('found distance', dayDistance);
-                break;
-              }
-            }
+      Fitness.getStepsAndDistances(moment(dateRef.current).startOf('month'), moment(dateRef.current).endOf('month'))
+        .then(dailyWalks => {
+          if (moment(dateRef.current).startOf('month').isSame(moment(queryDate).startOf('month'))) {
+            setDailyWalks(dailyWalks);
+            getStepsAndDistances(dateRef.current, dailyWalks);
+            saveStepsAndDistances(dailyWalks);
           }
+        });
+    } else if (Array.isArray(dailyWalks)) {
+      let total = 0;
+      let from = moment(queryDate).startOf('day');
+      let to = moment(from).endOf('day');
+      for (let dailyWalk of dailyWalks) {
+        if (from.isSameOrBefore(dailyWalk.date) && to.isSameOrAfter(dailyWalk.date)) {
+          setDailySteps({quantity: dailyWalk.steps});
+          setDailyDistance({quantity: dailyWalk.distance});
           if (totalSteps != null) {
             break;
           }
         }
-        newTotalSteps += step.quantity;
+        total += dailyWalk.steps;
       }
-      setDailySteps({quantity: daySteps});
       if (totalSteps == null) {
-        setTotalSteps({quantity: newTotalSteps});
+        setTotalSteps({quantity: total});
       }
-      setDailyDistance({quantity: dayDistance});
     }
   }
 
@@ -139,18 +91,15 @@ export default function HomeScreen({navigation}) {
     dateRef.current = newDate;
     setDate(newDate);
 
-    let newSteps = steps;
-    let newDistances = distances;
+    let newDailyWalks = dailyWalks;
     if (!oldDate.startOf('month').isSame(moment(newDate).startOf('month'))) {
-      newSteps = null;
-      newDistances = null;
+      newDailyWalks = null;
     }
-    getStepsAndDistances(newDate, newSteps, newDistances);
+    getStepsAndDistances(newDate, newDailyWalks);
     getRecordedWalks(newDate);
   };
 
   const refresh = () => {
-    console.log('refreshing');
     dateRef.current = moment(date.toDate());
     setDate(dateRef.current);
     getStepsAndDistances(dateRef.current, null, null);
