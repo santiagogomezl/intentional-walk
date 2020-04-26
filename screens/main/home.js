@@ -21,8 +21,17 @@ export default function HomeScreen({navigation}) {
   const [todaysWalk, setTodaysWalk] = useState(null);
   const [totalSteps, setTotalSteps] = useState(null);
 
+  const [contest, setContest] = useState(null);
+
   const [recordedWalks, setRecordedWalks] = useState(null);
   const [activeWalk, setActiveWalk] = useState(false);
+
+  const getAndUpdateContest = () => {
+    /// get current stored contest, if any, right away for display
+    Realm.getContest().then(contest => setContest(contest ? contest.toObject() : null));
+    /// in the meantime, also check for any updates
+    Realm.updateContest().then(contest => setContest(contest ? contest.toObject() : null));
+  };
 
   const saveStepsAndDistances = (dailyWalks) => {
     if (dailyWalks && dailyWalks.length > 0) {
@@ -137,6 +146,8 @@ export default function HomeScreen({navigation}) {
     Realm.getUser().then(user => {
       if (!user) {
         navigation.navigate('OnboardingStack');
+      } else {
+        getAndUpdateContest();
       }
     });
   }, []);
@@ -151,9 +162,6 @@ export default function HomeScreen({navigation}) {
   const isToday = date.isSame(today);
   const dateString = isToday ? Strings.common.today : date.format('MMMM D');
 
-  const START_DATE = '2020-06-01';
-  const isBeforeStartDate = moment(today).isBefore(START_DATE);
-
   return (
     <View style={GlobalStyles.container}>
       { !activeWalk &&
@@ -161,9 +169,9 @@ export default function HomeScreen({navigation}) {
         <ScrollView>
           <View style={[GlobalStyles.content, {paddingBottom: safeAreaInsets.bottom + 20 + 17 + 10 + 54}]}>
             <DateNavigator style={{marginBottom: 16}} date={date} setDate={setDateAndGetDailySteps}/>
-            { isBeforeStartDate && <View style={{marginBottom: 16}}>
+            { contest && contest.isBeforeStartDate && <View style={{marginBottom: 16}}>
               <Text style={styles.alertText}>{Strings.home.getReadyAlert1}</Text>
-              <Text style={styles.alertText}>{Strings.home.getReadyAlert2}</Text>
+              <Text style={styles.alertText}>{Strings.formatString(Strings.home.getReadyAlert2, moment(contest.start).format(Strings.common.date))}</Text>
             </View> }
             <View style={styles.row}>
               <StatBox

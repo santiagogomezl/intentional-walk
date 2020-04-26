@@ -18,6 +18,7 @@ import Autolink from 'react-native-autolink';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import loadLocalResource from 'react-native-local-resource'
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import moment from 'moment';
 
 import {Button, CheckBox, Input, Logo, PaginationDots, Popup, ScrollText} from '../../components';
 import {Colors, GlobalStyles} from '../../styles';
@@ -25,7 +26,8 @@ import {Api, Realm, Strings} from '../../lib';
 
 import Privacy from '../../assets/privacy';
 
-export default function SignUpScreen({navigation}) {
+export default function SignUpScreen({navigation, route}) {
+  const {contest} = route.params;
   const [focus, setFocus] = useState('');
 
   const [name, setName] = useState('');
@@ -98,10 +100,9 @@ export default function SignUpScreen({navigation}) {
         navigation.navigate('Info');
       })
       .catch(error => {
-        console.log(error);
         setLoading(false);
-        setAlertTitle(Strings.common.errorTitle);
-        setAlertMessage(Strings.common.errorMessage);
+        setAlertTitle(Strings.common.serverErrorTitle);
+        setAlertMessage(Strings.common.serverErrorMessage);
         setShowAlert(true);
       });
   };
@@ -127,7 +128,7 @@ export default function SignUpScreen({navigation}) {
               <Image source={require('../../assets/sfdph_logo.png')} style={[styles.logo, styles.sfdphLogo]} />
               <Image source={require('../../assets/sfgiants_logo.png')} style={[styles.logo, styles.giantsLogo]} />
             </View>
-            <Text style={GlobalStyles.p1} textBreakStrategy="simple">{Strings.signUp.about}</Text>
+            <Text style={GlobalStyles.p1} textBreakStrategy="simple">{Strings.formatString(Strings.signUp.about, Strings.formatString(Strings.common.range, moment(contest.start).format(Strings.common.rangeFrom), moment(contest.end).format(Strings.common.rangeTo)))}</Text>
             <Input onSubmitEditing={() => setFocus('email')} onChangeText={(newValue) => setName(newValue)} placeholder={Strings.signUp.name} autoCapitalize="words" autoCompleteType="name" returnKeyType="next" editable={!isLoading}></Input>
             <Input focused={focus == 'email'} onSubmitEditing={() => setFocus('zip')} onChangeText={(newValue) => setEmail(newValue)} placeholder={Strings.signUp.email} autoCompleteType="email" keyboardType="email-address" returnKeyType="next" editable={!isLoading}></Input>
             <View style={styles.row}>
