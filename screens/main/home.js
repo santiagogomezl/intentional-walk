@@ -26,19 +26,21 @@ export default function HomeScreen({navigation}) {
   const [activeWalk, setActiveWalk] = useState(false);
 
   const saveStepsAndDistances = (dailyWalks) => {
-    /// get user account, then save to server...!
-    Realm.getUser()
-      .then(user => {
-        if (user) {
-          return Api.dailyWalk.create(dailyWalks, user.id);
-        }
-      })
-      .then(response => {
-        /// silent for now
-      })
-      .catch(error => {
-        /// silent for now- send to remote logger (Firebase?)
-      });
+    if (dailyWalks && dailyWalks.length > 0) {
+      /// get user account, then save to server...!
+      Realm.getUser()
+        .then(user => {
+          if (user) {
+            return Api.dailyWalk.create(dailyWalks, user.id);
+          }
+        })
+        .then(response => {
+          /// silent for now
+        })
+        .catch(error => {
+          /// silent for now- send to remote logger (Firebase?)
+        });
+    }
   };
 
   const getStepsAndDistances = (queryDate, dailyWalks) => {
@@ -54,21 +56,28 @@ export default function HomeScreen({navigation}) {
             getStepsAndDistances(dateRef.current, dailyWalks);
             saveStepsAndDistances(dailyWalks);
           }
+        })
+        .catch(error => {
+          console.log(error);
         });
     } else if (Array.isArray(dailyWalks)) {
+      let stepsQuantity = 0;
+      let distanceQuantity = 0;
       let total = 0;
       let from = moment(queryDate).startOf('day');
       let to = moment(from).endOf('day');
       for (let dailyWalk of dailyWalks) {
         if (from.isSameOrBefore(dailyWalk.date) && to.isSameOrAfter(dailyWalk.date)) {
-          setDailySteps({quantity: dailyWalk.steps});
-          setDailyDistance({quantity: dailyWalk.distance});
+          stepsQuantity = dailyWalk.steps;
+          distanceQuantity = dailyWalk.distance;
           if (totalSteps != null) {
             break;
           }
         }
         total += dailyWalk.steps;
       }
+      setDailySteps({quantity: stepsQuantity});
+      setDailyDistance({quantity: distanceQuantity});
       if (totalSteps == null) {
         setTotalSteps({quantity: total});
       }
