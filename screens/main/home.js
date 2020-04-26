@@ -169,7 +169,7 @@ export default function HomeScreen({navigation}) {
                 boxColor={Colors.accent.teal}
               />
               <StatBox
-                mainText={dailyDistance ? numeral(dailyDistance.quantity / 1609.0).format('0,0.0') : "*"}
+                mainText={dailyDistance ? numeral(dailyDistance.quantity * 0.000621371).format('0,0.0') : "*"}
                 subText={isToday ? Strings.home.milesToday : Strings.common.miles}
                 icon="swap-calls"
                 iconSize={200}
