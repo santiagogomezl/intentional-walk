@@ -102,7 +102,7 @@ export default function HomeScreen({navigation}) {
   const refresh = () => {
     dateRef.current = moment(date.toDate());
     setDate(dateRef.current);
-    getStepsAndDistances(dateRef.current, null, null);
+    getStepsAndDistances(dateRef.current, null);
     getRecordedWalks(dateRef.current);
   };
 
