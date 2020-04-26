@@ -91,7 +91,7 @@ export default function SignUpScreen({navigation}) {
         return Api.appUser.create(name.trim(), email.trim(), zip.trim(), parsedAge, settings.accountId);
       })
       .then(response => {
-        return Realm.createUser(name.trim(), email.trim(), zip.trim(), parsedAge);
+        return Realm.createUser(response.data.payload.account_id, name.trim(), email.trim(), zip.trim(), parsedAge);
       })
       .then(user => {
         setLoading(false);
