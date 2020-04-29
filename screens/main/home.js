@@ -175,7 +175,7 @@ export default function HomeScreen({navigation}) {
             </View> }
             <View style={styles.row}>
               <StatBox
-                mainText={todaysWalk ? numeral(todaysWalk.steps).format('0,0') : "*"}
+                mainText={todaysWalk ? numeral(todaysWalk.steps).format('0,0') : " "}
                 subText={isToday ? Strings.home.stepsToday : Strings.common.steps}
                 icon="directions-walk"
                 iconSize={140}
@@ -184,7 +184,7 @@ export default function HomeScreen({navigation}) {
                 boxColor={Colors.accent.teal}
               />
               <StatBox
-                mainText={todaysWalk ? numeral(todaysWalk.distance * 0.000621371).format('0,0.0') : "*"}
+                mainText={todaysWalk ? numeral(todaysWalk.distance * 0.000621371).format('0,0.0') : " "}
                 subText={isToday ? Strings.home.milesToday : Strings.common.miles}
                 icon="swap-calls"
                 iconSize={200}
@@ -195,7 +195,7 @@ export default function HomeScreen({navigation}) {
             </View>
             <View style={[styles.row, isToday ? null : styles.hidden]} pointerEvents={isToday? 'auto' : 'none'}>
               <StatBox
-                mainText={totalSteps != null ? numeral(totalSteps).format('0,0') : "*"}
+                mainText={totalSteps != null ? numeral(totalSteps).format('0,0') : " "}
                 subText={Strings.home.overallStepTotal}
                 icon="star-border"
                 iconSize={200}
