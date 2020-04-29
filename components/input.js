@@ -31,6 +31,7 @@ export default function Input(props) {
                placeholderTextColor={Colors.primary.gray2}
                autoCapitalize={props.autoCapitalize || 'none'}
                autoCompleteType={props.autoCompleteType || 'off'}
+               autoCorrect={props.autoCorrect || false}
                keyboardType={props.keyboardType || 'default'}
                returnKeyType={props.returnKeyType || 'done'} />
   );
