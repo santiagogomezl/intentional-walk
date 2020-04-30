@@ -26,22 +26,44 @@ export default function HomeScreen({navigation}) {
   const [recordedWalks, setRecordedWalks] = useState(null);
   const [activeWalk, setActiveWalk] = useState(false);
 
-  const saveStepsAndDistances = (dailyWalks) => {
-    if (dailyWalks && dailyWalks.length > 0) {
-      /// get user account, then save to server...!
-      Realm.getUser()
-        .then(user => {
-          if (user) {
-            return Api.dailyWalk.create(dailyWalks, user.id);
+  const saveStepsAndDistances = () => {
+    Realm.getContest().then(contest => {
+        const today = moment().startOf('day');
+        let from = null, to = null;
+        if (contest) {
+          /// check if we're in/after the contest period
+          if (!contest.isBeforeStartDate) {
+            from = moment(contest.start);
+            /// check if we're in the contest period
+            if (contest.isAfterEndDate) {
+              to = moment(contest.end);
+            } else {
+              to = today;
+            }
           }
-        })
-        .then(response => {
-          /// silent for now
-        })
-        .catch(error => {
-          /// silent for now- send to remote logger (Firebase?)
-        });
-    }
+        }
+        /// only save when within contest period
+        if (from && to) {
+          Fitness.getStepsAndDistances(moment(dateRef.current).startOf('month'), moment(dateRef.current).endOf('month'))
+            .then(dailyWalks => {
+              if (dailyWalks && dailyWalks.length > 0) {
+                /// get user account, then save to server...!
+                Realm.getUser()
+                  .then(user => {
+                    if (user) {
+                      return Api.dailyWalk.create(dailyWalks, user.id);
+                    }
+                  })
+                  .then(response => {
+                    /// silent for now
+                  })
+                  .catch(error => {
+                    /// silent for now- send to remote logger (Firebase?)
+                  });
+              }
+            });
+        }
+      });
   };
 
   const getStepsAndDistances = (queryDate, dailyWalks) => {
@@ -53,7 +75,6 @@ export default function HomeScreen({navigation}) {
           if (moment(dateRef.current).startOf('month').isSame(moment(queryDate).startOf('month'))) {
             setDailyWalks(dailyWalks);
             getStepsAndDistances(dateRef.current, dailyWalks);
-            saveStepsAndDistances(dailyWalks);
           }
         })
         .catch(error => {
@@ -84,13 +105,13 @@ export default function HomeScreen({navigation}) {
         let from = null, to = null;
         if (contest) {
           /// check if we're in/after the contest period
-          if (moment(contest.start).isSameOrBefore(today)) {
+          if (!contest.isBeforeStartDate) {
             from = moment(contest.start);
             /// check if we're in the contest period
-            if (moment(contest.end).isSameOrAfter(today)) {
-              to = today;
-            } else {
+            if (contest.isAfterEndDate) {
               to = moment(contest.end);
+            } else {
+              to = today;
             }
           }
         }
@@ -111,7 +132,7 @@ export default function HomeScreen({navigation}) {
         if (from && to) {
           let totalSteps = 0;
           Fitness.getSteps(from, to).then(steps => {
-            for (let step in steps) {
+            for (let step of steps) {
               totalSteps += step.quantity;
             }
           }).finally(() => setTotalSteps(totalSteps));
@@ -152,36 +173,43 @@ export default function HomeScreen({navigation}) {
     getStepsAndDistances(dateRef.current, null);
     getTotalSteps();
     getRecordedWalks(dateRef.current);
+    saveStepsAndDistances();
   };
 
+  /// one time setup for some data store listeners
   useEffect(() => {
-    const listener = (results, changes) => setActiveWalk(results.length > 0 ? results[0] : null);
-    let results = null;
-    Realm.open().then(realm => {
-      results = realm.objects('IntentionalWalk').filtered('end=null');
-      results.addListener(listener);
-    });
-    return () => results ? results.removeListener(listener) : null;
+    /// listen for an active walk
+    Realm.addCurrentWalkListener(walk => setActiveWalk(walk));
+    /// listen for updates to contest info
+    Realm.addContestListener(contest => contest ? setContest(contest.toObject()) : null);
+    /// on cleanup, remove listeners
+    return () => Realm.removeAllListeners();
   }, []);
 
+  /// perform a bunch of other one-time checks/setup on app launch
   useEffect(() => {
     SplashScreen.hide();
+    /// load settings
     Realm.getSettings().then(settings => {
       const lang = settings.lang;
       if (lang) {
+        /// set language preference, if any
         Strings.setLanguage(lang);
+        /// recreate the date in the current locale
         moment.locale(lang);
         dateRef.current = moment(date.toDate());
         setDate(dateRef.current);
       }
     });
+    /// get signed in user, if any
     Realm.getUser().then(user => {
+      /// if no user, go to onboarding flow
       if (!user) {
         navigation.navigate('OnboardingStack');
       }
     });
-    Realm.addContestListener(contest => contest ? setContest(contest.toObject()) : null);
-    return () => Realm.removeAllListeners();
+    /// check for updated contest info
+    Realm.updateContest();
   }, []);
 
   useFocusEffect(
