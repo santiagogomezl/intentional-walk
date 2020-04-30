@@ -121,7 +121,7 @@ export default function HomeScreen({navigation}) {
           return Realm.getUser().then(user => {
             if (contest && user) {
               let from = moment(user.createdAt);
-              if (from.isBefore(moment(contest.startPromo))) {
+              if (moment(contest.startPromo).isBefore(now) && from.isBefore(moment(contest.startPromo))) {
                 from = moment(contest.startPromo);
               }
               return [from, now];
