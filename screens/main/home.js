@@ -115,14 +115,14 @@ export default function HomeScreen({navigation}) {
             }
           }
         }
-        /// if no contest, or we're before the contest...
+        /// if no contest (should never happen), or we're before the contest...
         if (!from || !to) {
-          /// total up from when user created to today, or beginning of month, whichever later
+          /// total up from when user created to today, or beginning of promo, whichever later
           return Realm.getUser().then(user => {
-            if (user) {
+            if (contest && user) {
               let from = moment(user.createdAt);
-              if (from.isBefore(moment().startOf('month'))) {
-                from = moment().startOf('month');
+              if (from.isBefore(moment(contest.startPromo))) {
+                from = moment(contest.startPromo);
               }
               return [from, today];
             }
