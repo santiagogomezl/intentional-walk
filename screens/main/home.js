@@ -117,12 +117,16 @@ export default function HomeScreen({navigation}) {
         }
         /// if no contest, or we're before the contest...
         if (!from || !to) {
-          /// total up from when user created to today
+          /// total up from when user created to today, or beginning of month, whichever later
           return Realm.getUser().then(user => {
             if (user) {
-              return [moment(user.createdAt), today];
+              let from = moment(user.createdAt);
+              if (from.isBefore(moment().startOf('month'))) {
+                from = moment().startOf('month');
+              }
+              return [from, today];
             }
-            /// no contest, no user
+            /// no contest, no user, so don't return a range
             return [null, null];
           });
         }
